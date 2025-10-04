@@ -1,13 +1,19 @@
 import { useState, useEffect } from 'react';
-import { Wallet } from 'lucide-react';
+import { Wallet, Plus } from 'lucide-react';
 import Layout from '../layout/Layout';
 import AccountCard from '../components/AccountCard';
 import SkeletonCard from '../components/SkeletonCard';
+import Modal from '../components/Modal';
+import CreateAccountForm from '../components/CreateAccountForm';
+import Toast from '../components/Toast';
 
 const Accounts = () => {
   const [cuentas, setCuentas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
 
   useEffect(() => {
     const fetchCuentas = async () => {
@@ -29,6 +35,17 @@ const Accounts = () => {
     fetchCuentas();
   }, []);
 
+  const handleCreateSuccess = (newAccount) => {
+    setCuentas(prev => [...prev, newAccount]);
+    setIsModalOpen(false);
+    setToastMessage('¡Cuenta creada exitosamente!');
+    setShowToast(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
 
   if (error) {
     return (
@@ -49,12 +66,21 @@ const Accounts = () => {
             <h1 className="text-3xl font-bold text-gray-900">Mis Cuentas</h1>
             <p className="text-gray-600 mt-1">Gestiona tus cuentas financieras</p>
           </div>
-          {!loading && (
-            <div className="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-lg">
-              <Wallet className="w-5 h-5 text-blue-600" />
-              <span className="font-semibold text-blue-900">{cuentas.length} Cuentas</span>
-            </div>
-          )}
+          <div className="flex items-center gap-3">
+            {!loading && (
+              <div className="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-lg">
+                <Wallet className="w-5 h-5 text-blue-600" />
+                <span className="font-semibold text-blue-900">{cuentas.length} Cuentas</span>
+              </div>
+            )}
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-md hover:shadow-lg"
+            >
+              <Plus className="w-5 h-5" />
+              Nueva Cuenta
+            </button>
+          </div>
         </div>
 
         {loading ? (
@@ -77,6 +103,26 @@ const Accounts = () => {
           </div>
         )}
       </div>
+
+      <Modal 
+        isOpen={isModalOpen} 
+        onClose={handleCloseModal}
+        title="Crear Nueva Cuenta"
+      >
+        <CreateAccountForm 
+          onSuccess={handleCreateSuccess}
+          onCancel={handleCloseModal}
+        />
+      </Modal>
+
+      {showToast && (
+        <Toast
+          message={toastMessage}
+          type="success"
+          onClose={() => setShowToast(false)}
+          duration={3000}
+        />
+      )}
     </Layout>
   );
 };
