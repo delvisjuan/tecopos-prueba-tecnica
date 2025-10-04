@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Wallet, Plus } from 'lucide-react';
 import Layout from '../layout/Layout';
 import AccountCard from '../components/AccountCard';
@@ -9,6 +10,7 @@ import Toast from '../components/Toast';
 import ConfirmModal from '../components/ConfirmModal';
 
 const Accounts = () => {
+  const navigate = useNavigate();
   const [cuentas, setCuentas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -79,7 +81,7 @@ const Accounts = () => {
   };
 
   const handleManageOperations = (accountId) => {
-    alert(`Gestionar operaciones para la cuenta ${accountId}`);
+    navigate(`/Accounts/${accountId}/operations`);
   };
 
   const handleAccountSubmit = (accountData, isEditing) => {

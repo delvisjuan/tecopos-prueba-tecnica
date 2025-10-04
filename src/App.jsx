@@ -5,6 +5,7 @@ import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
 import Accounts from './pages/Accounts';
+import Operations from './pages/Operations';
 
 function App() {
   return (
@@ -17,6 +18,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Accounts />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/Accounts/:accountId/operations" 
+            element={
+              <ProtectedRoute>
+                <Operations />
               </ProtectedRoute>
             } 
           />
