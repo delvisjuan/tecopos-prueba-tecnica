@@ -54,7 +54,7 @@ const Sidebar = ({ isOpen, onClose }) => {
             className="flex items-center gap-3 px-4 py-3 text-gray-700 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors"
           >
             <Home className="w-5 h-5 text-indigo-600" />
-            <span className="font-medium text-indigo-600">Inicio</span>
+            <span className="font-medium text-indigo-600">Cuentas</span>
           </a>
         </nav>
 

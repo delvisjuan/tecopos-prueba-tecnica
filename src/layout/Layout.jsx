@@ -21,8 +21,7 @@ const Layout = ({ children }) => {
             >
               <Menu className="w-6 h-6" />
             </button>
-            <h1 className="text-lg font-bold text-gray-900">Dashboard</h1>
-            <div className="w-6" /> {/* Spacer para centrar el título */}
+            
           </div>
         </header>
 
