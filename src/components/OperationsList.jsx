@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { TrendingUp, TrendingDown, Calendar, FileText } from 'lucide-react';
+import { FileText } from 'lucide-react';
+import OperationItem from './OperationItem';
 
-const OperationsList = ({ accountId }) => {
+const OperationsList = ({ accountId, onEdit, onDelete, onRefresh }) => {
   const [operations, setOperations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -15,7 +16,10 @@ const OperationsList = ({ accountId }) => {
           throw new Error('Error al cargar las operaciones');
         }
         const data = await response.json();
-        setOperations(data);
+        
+        // Ordenar por fecha de más reciente a más antigua
+        const sortedData = data.sort((a, b) => new Date(b.date) - new Date(a.date));
+        setOperations(sortedData);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -26,24 +30,7 @@ const OperationsList = ({ accountId }) => {
     if (accountId) {
       fetchOperations();
     }
-  }, [accountId]);
-
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('es-ES', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(amount);
-  };
-
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
+  }, [accountId, onRefresh]);
 
   const SkeletonItem = () => (
     <div className="flex items-center gap-4 p-4 bg-white border-b border-gray-100 animate-pulse">
@@ -93,42 +80,12 @@ const OperationsList = ({ accountId }) => {
     <div className="max-h-[500px] overflow-y-auto">
       <div className="divide-y divide-gray-100">
         {operations.map((operation) => (
-          <div
+          <OperationItem
             key={operation.id}
-            className="flex items-center gap-4 p-4 hover:bg-gray-50 transition-colors"
-          >
-            <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
-              operation.type === 'INCOME' 
-                ? 'bg-green-100 text-green-600' 
-                : 'bg-red-100 text-red-600'
-            }`}>
-              {operation.type === 'INCOME' ? (
-                <TrendingUp className="w-5 h-5" />
-              ) : (
-                <TrendingDown className="w-5 h-5" />
-              )}
-            </div>
-
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-gray-900 truncate">
-                {operation.concept}
-              </p>
-              <div className="flex items-center gap-2 mt-1">
-                <Calendar className="w-3 h-3 text-gray-400" />
-                <p className="text-xs text-gray-500">
-                  {formatDate(operation.date)}
-                </p>
-              </div>
-            </div>
-
-            <div className={`text-right font-bold ${
-              operation.type === 'INCOME' ? 'text-green-600' : 'text-red-600'
-            }`}>
-              <p className="text-sm">
-                {operation.type === 'INCOME' ? '+' : '-'} {formatCurrency(operation.amount)}
-              </p>
-            </div>
-          </div>
+            operation={operation}
+            onEdit={onEdit}
+            onDelete={onDelete}
+          />
         ))}
       </div>
     </div>
