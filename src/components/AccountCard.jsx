@@ -1,6 +1,6 @@
-import { Wallet, DollarSign, Euro } from 'lucide-react';
+import { Wallet, DollarSign, Euro, Edit, Trash2, Calculator } from 'lucide-react';
 
-const AccountCard = ({ cuenta }) => {
+const AccountCard = ({ cuenta, onEdit, onDelete, onManageOperations }) => {
   const formatCurrency = (amount, currency) => {
     return new Intl.NumberFormat('es-ES', {
       style: 'currency',
@@ -57,6 +57,33 @@ const AccountCard = ({ cuenta }) => {
             <div className="flex items-center justify-between text-sm mt-2">
               <span className="text-gray-500">Creada:</span>
               <span className="font-medium text-gray-700">{formatDate(cuenta.createdAt)}</span>
+            </div>
+          </div>
+
+          {/* Botones de acción */}
+          <div className="pt-4 border-t border-gray-200 mt-4">
+            <div className="flex gap-2 justify-end">
+              <button
+                onClick={() => onManageOperations && onManageOperations(cuenta.id)}
+                className="flex items-center justify-center w-8 h-8 rounded-md bg-green-50 text-green-700 hover:bg-green-100 transition-colors"
+                title="Gestionar operaciones"
+              >
+                <Calculator className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => onEdit && onEdit(cuenta)}
+                className="flex items-center justify-center w-8 h-8 rounded-md bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors"
+                title="Editar cuenta"
+              >
+                <Edit className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => onDelete && onDelete(cuenta.id)}
+                className="flex items-center justify-center w-8 h-8 rounded-md bg-red-50 text-red-700 hover:bg-red-100 transition-colors"
+                title="Eliminar cuenta"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
             </div>
           </div>
         </div>

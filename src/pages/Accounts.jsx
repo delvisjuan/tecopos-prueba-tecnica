@@ -4,8 +4,9 @@ import Layout from '../layout/Layout';
 import AccountCard from '../components/AccountCard';
 import SkeletonCard from '../components/SkeletonCard';
 import Modal from '../components/Modal';
-import CreateAccountForm from '../components/CreateAccountForm';
+import AccountForm from '../components/AccountForm';
 import Toast from '../components/Toast';
+import ConfirmModal from '../components/ConfirmModal';
 
 const Accounts = () => {
   const [cuentas, setCuentas] = useState([]);
@@ -14,6 +15,9 @@ const Accounts = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [editingAccount, setEditingAccount] = useState(null);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [accountToDelete, setAccountToDelete] = useState(null);
 
   useEffect(() => {
     const fetchCuentas = async () => {
@@ -35,15 +39,63 @@ const Accounts = () => {
     fetchCuentas();
   }, []);
 
-  const handleCreateSuccess = (newAccount) => {
-    setCuentas(prev => [...prev, newAccount]);
-    setIsModalOpen(false);
-    setToastMessage('¡Cuenta creada exitosamente!');
-    setShowToast(true);
-  };
-
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    setEditingAccount(null);
+  };
+
+  const handleEditAccount = (account) => {
+    setEditingAccount(account);
+    setIsModalOpen(true);
+  };
+
+  const handleDeleteAccount = (accountId) => {
+    setAccountToDelete(accountId);
+    setIsConfirmModalOpen(true);
+  };
+
+  const confirmDeleteAccount = async () => {
+    if (!accountToDelete) return;
+
+    try {
+      const response = await fetch(`https://68e171938943bf6bb3c4393a.mockapi.io/api/cuenta/${accountToDelete}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al eliminar la cuenta');
+      }
+
+      setCuentas(prev => prev.filter(cuenta => cuenta.id !== accountToDelete));
+      setToastMessage('Cuenta eliminada exitosamente');
+      setShowToast(true);
+    } catch (error) {
+      console.error('Error al eliminar la cuenta:', error);
+      setToastMessage('Error al eliminar la cuenta');
+      setShowToast(true);
+    } finally {
+      setAccountToDelete(null);
+    }
+  };
+
+  const handleManageOperations = (accountId) => {
+    alert(`Gestionar operaciones para la cuenta ${accountId}`);
+  };
+
+  const handleAccountSubmit = (accountData, isEditing) => {
+    if (isEditing) {
+      setCuentas(prev => prev.map(cuenta =>
+        cuenta.id === editingAccount.id
+          ? { ...cuenta, ...accountData }
+          : cuenta
+      ));
+      setToastMessage('Cuenta actualizada exitosamente');
+    } else {
+      setCuentas(prev => [...prev, accountData]);
+      setToastMessage('Cuenta creada exitosamente');
+    }
+    setShowToast(true);
+    handleCloseModal();
   };
 
 
@@ -98,7 +150,13 @@ const Accounts = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {cuentas.map((cuenta) => (
-              <AccountCard key={cuenta.id} cuenta={cuenta} />
+              <AccountCard
+                key={cuenta.id}
+                cuenta={cuenta}
+                onEdit={handleEditAccount}
+                onDelete={handleDeleteAccount}
+                onManageOperations={handleManageOperations}
+              />
             ))}
           </div>
         )}
@@ -107,11 +165,12 @@ const Accounts = () => {
       <Modal 
         isOpen={isModalOpen} 
         onClose={handleCloseModal}
-        title="Crear Nueva Cuenta"
+        title={editingAccount ? "Editar Cuenta" : "Crear Nueva Cuenta"}
       >
-        <CreateAccountForm 
-          onSuccess={handleCreateSuccess}
+        <AccountForm 
+          onSuccess={handleAccountSubmit}
           onCancel={handleCloseModal}
+          editingAccount={editingAccount}
         />
       </Modal>
 
@@ -123,6 +182,17 @@ const Accounts = () => {
           duration={3000}
         />
       )}
+
+      <ConfirmModal
+        isOpen={isConfirmModalOpen}
+        onClose={() => setIsConfirmModalOpen(false)}
+        onConfirm={confirmDeleteAccount}
+        title="Eliminar Cuenta"
+        message="¿Estás seguro de que quieres eliminar esta cuenta? Esta acción no se puede deshacer y se perderán todos los datos asociados."
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        type="danger"
+      />
     </Layout>
   );
 };

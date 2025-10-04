@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 
-const CreateAccountForm = ({ onSuccess, onCancel }) => {
+const AccountForm = ({ onSuccess, onCancel, editingAccount }) => {
   const [formData, setFormData] = useState({
     name: '',
     balance: '',
@@ -10,6 +10,24 @@ const CreateAccountForm = ({ onSuccess, onCancel }) => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (editingAccount) {
+      setFormData({
+        name: editingAccount.name || '',
+        balance: editingAccount.balance || '',
+        currency: editingAccount.currency || 'USD',
+        userId: editingAccount.userId || '1'
+      });
+    } else {
+      setFormData({
+        name: '',
+        balance: '',
+        currency: 'USD',
+        userId: '1'
+      });
+    }
+  }, [editingAccount]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -23,7 +41,6 @@ const CreateAccountForm = ({ onSuccess, onCancel }) => {
     e.preventDefault();
     setError(null);
 
-    // Validaciones
     if (!formData.name.trim()) {
       setError('El nombre de la cuenta es requerido');
       return;
@@ -36,38 +53,41 @@ const CreateAccountForm = ({ onSuccess, onCancel }) => {
 
     try {
       setLoading(true);
-      
+
       const payload = {
         name: formData.name.trim(),
         balance: parseFloat(formData.balance),
         currency: formData.currency,
-        userId: formData.userId,
-        createdAt: new Date().toISOString()
+        userId: formData.userId
       };
 
-      const response = await fetch('https://68e171938943bf6bb3c4393a.mockapi.io/api/cuenta', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (!response.ok) {
-        throw new Error('Error al crear la cuenta');
+      let response;
+      if (editingAccount) {
+        response = await fetch(`https://68e171938943bf6bb3c4393a.mockapi.io/api/cuenta/${editingAccount.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload)
+        });
+      } else {
+        payload.createdAt = new Date().toISOString();
+        response = await fetch('https://68e171938943bf6bb3c4393a.mockapi.io/api/cuenta', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload)
+        });
       }
 
-      const newAccount = await response.json();
-      
-      // Resetear formulario
-      setFormData({
-        name: '',
-        balance: '',
-        currency: 'USD',
-        userId: '1'
-      });
+      if (!response.ok) {
+        throw new Error(`Error al ${editingAccount ? 'actualizar' : 'crear'} la cuenta`);
+      }
 
-      onSuccess(newAccount);
+      const updatedAccount = await response.json();
+
+      onSuccess(updatedAccount, !!editingAccount);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -153,10 +173,10 @@ const CreateAccountForm = ({ onSuccess, onCancel }) => {
           {loading ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
-              Creando...
+              {editingAccount ? 'Actualizando...' : 'Creando...'}
             </>
           ) : (
-            'Crear Cuenta'
+            editingAccount ? 'Actualizar Cuenta' : 'Crear Cuenta'
           )}
         </button>
       </div>
@@ -164,4 +184,4 @@ const CreateAccountForm = ({ onSuccess, onCancel }) => {
   );
 };
 
-export default CreateAccountForm;
+export default AccountForm;
