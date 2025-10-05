@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FileText } from 'lucide-react';
-import OperationItem from './OperationItem';
+import OperationItem from './Item';
 
 const OperationsList = ({ accountId, onEdit, onDelete, onRefresh }) => {
   const [operations, setOperations] = useState([]);

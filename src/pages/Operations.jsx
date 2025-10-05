@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, Wallet } from 'lucide-react';
 import Layout from '../layout/Layout';
-import OperationsList from '../components/OperationsList';
+import OperationsList from '../components/Operation/List';
 import Modal from '../components/Modal';
-import OperationForm from '../components/OperationForm';
+import OperationForm from '../components/Operation/Form';
 import Toast from '../components/Toast';
 import ConfirmModal from '../components/ConfirmModal';
 

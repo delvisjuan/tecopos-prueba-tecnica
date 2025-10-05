@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Wallet, Plus } from 'lucide-react';
 import Layout from '../layout/Layout';
-import AccountCard from '../components/AccountCard';
+import AccountCard from '../components/Account/Card';
 import SkeletonCard from '../components/SkeletonCard';
 import Modal from '../components/Modal';
-import AccountForm from '../components/AccountForm';
+import AccountForm from '../components/Account/Form';
 import Toast from '../components/Toast';
 import ConfirmModal from '../components/ConfirmModal';
 
