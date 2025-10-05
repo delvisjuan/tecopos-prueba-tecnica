@@ -65,7 +65,7 @@ npm run lint
 
 La aplicación está desplegada en Vercel y disponible en:
 
-**URL**: [https://tecopos-prueba-tecnica-git-main-delvis-juans-projects.vercel.app/login](https://tecopos-prueba-tecnica-git-main-delvis-juans-projects.vercel.app/login)
+**URL**: [https://tecopos-prueba-tecnica.vercel.app/login](https://tecopos-prueba-tecnica.vercel.app/login)
 
 ## 📖 Uso de la Aplicación
 
